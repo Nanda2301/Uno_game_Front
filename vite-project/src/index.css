@@ -1,0 +1,150 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-arena-bg text-white font-body;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-arena-surface;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-arena-border rounded-full;
+  }
+}
+
+@layer components {
+  .uno-card {
+    @apply relative rounded-xl cursor-pointer transition-all duration-200;
+    transform-style: preserve-3d;
+    perspective: 1000px;
+  }
+
+  .uno-card:hover {
+    @apply -translate-y-3;
+    filter: brightness(1.1);
+  }
+
+  .uno-card.selected {
+    @apply -translate-y-5 ring-4 ring-white ring-opacity-80;
+  }
+
+  .glass-panel {
+    @apply bg-arena-surface bg-opacity-80 backdrop-blur-lg border border-arena-border rounded-2xl;
+  }
+
+  .btn-primary {
+    @apply bg-gradient-to-r from-uno-red to-red-700 text-white font-display tracking-wider
+           px-6 py-3 rounded-xl transition-all duration-200 text-lg
+           hover:from-red-500 hover:to-uno-red hover:scale-105 hover:shadow-lg
+           active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100;
+    box-shadow: 0 4px 20px rgba(232, 0, 28, 0.3);
+  }
+
+  .btn-secondary {
+    @apply bg-arena-card border border-arena-border text-white font-body font-medium
+           px-5 py-2.5 rounded-xl transition-all duration-200
+           hover:border-arena-glow hover:bg-arena-glow hover:bg-opacity-20 hover:scale-105
+           active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-success {
+    @apply bg-gradient-to-r from-uno-green to-green-700 text-white font-display tracking-wider
+           px-6 py-3 rounded-xl transition-all duration-200 text-lg
+           hover:from-green-500 hover:to-uno-green hover:scale-105
+           active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed;
+    box-shadow: 0 4px 20px rgba(0, 165, 80, 0.3);
+  }
+
+  .input-field {
+    @apply w-full bg-arena-card border border-arena-border rounded-xl px-4 py-3
+           text-white placeholder-gray-500 font-body
+           focus:outline-none focus:border-arena-glow focus:ring-2 focus:ring-arena-glow focus:ring-opacity-20
+           transition-all duration-200;
+  }
+
+  .status-badge {
+    @apply text-xs font-body font-semibold px-3 py-1 rounded-full uppercase tracking-wider;
+  }
+
+  .status-waiting {
+    @apply status-badge bg-yellow-500 bg-opacity-20 text-yellow-400 border border-yellow-500 border-opacity-30;
+  }
+
+  .status-progress {
+    @apply status-badge bg-green-500 bg-opacity-20 text-green-400 border border-green-500 border-opacity-30;
+  }
+
+  .status-finished {
+    @apply status-badge bg-gray-500 bg-opacity-20 text-gray-400 border border-gray-500 border-opacity-30;
+  }
+
+  .arena-bg-pattern {
+    background-color: #0D0D1A;
+    background-image: 
+      radial-gradient(circle at 1px 1px, rgba(74,108,247,0.12) 1px, transparent 0);
+    background-size: 40px 40px;
+  }
+
+  .neon-text-red {
+    text-shadow: 0 0 10px rgba(232, 0, 28, 0.8), 0 0 20px rgba(232, 0, 28, 0.5), 0 0 40px rgba(232, 0, 28, 0.3);
+  }
+
+  .neon-text-blue {
+    text-shadow: 0 0 10px rgba(0, 102, 204, 0.8), 0 0 20px rgba(0, 102, 204, 0.5);
+  }
+
+  .player-turn-ring {
+    animation: pulseGlow 1.5s ease-in-out infinite;
+    box-shadow: 0 0 0 3px rgba(74, 108, 247, 0.6), 0 0 20px rgba(74, 108, 247, 0.4);
+  }
+
+  .card-shadow-red { box-shadow: 0 8px 32px rgba(232, 0, 28, 0.5), 0 2px 8px rgba(0,0,0,0.3); }
+  .card-shadow-blue { box-shadow: 0 8px 32px rgba(0, 102, 204, 0.5), 0 2px 8px rgba(0,0,0,0.3); }
+  .card-shadow-green { box-shadow: 0 8px 32px rgba(0, 165, 80, 0.5), 0 2px 8px rgba(0,0,0,0.3); }
+  .card-shadow-yellow { box-shadow: 0 8px 32px rgba(255, 215, 0, 0.5), 0 2px 8px rgba(0,0,0,0.3); }
+  .card-shadow-black { box-shadow: 0 8px 32px rgba(74, 108, 247, 0.5), 0 2px 8px rgba(0,0,0,0.3); }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 0 3px rgba(74, 108, 247, 0.6), 0 0 20px rgba(74, 108, 247, 0.4); }
+  50% { box-shadow: 0 0 0 5px rgba(74, 108, 247, 0.8), 0 0 40px rgba(74, 108, 247, 0.6); }
+}
+
+/* Card flip animation */
+.card-face {
+  backface-visibility: hidden;
+}
+
+/* Hand scrollbar */
+.hand-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(74, 108, 247, 0.3) transparent;
+}
+
+.hand-scroll::-webkit-scrollbar {
+  height: 4px;
+}
+
+.hand-scroll::-webkit-scrollbar-thumb {
+  background: rgba(74, 108, 247, 0.4);
+  border-radius: 2px;
+}
