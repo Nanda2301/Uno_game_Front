@@ -1,67 +1,58 @@
-import axios from 'axios';
+import axios from "axios";
 
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: "http://localhost:3000/api",
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
 });
 
-// Attach token to every request
+// Interceptor de REQUEST (só LÊ o token)
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('uno_token');
+  const token = localStorage.getItem("uno_token");
+
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+
   return config;
 });
 
-// Handle 401 - redirect to login
+// Interceptor de RESPONSE
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem('uno_token');
-      localStorage.removeItem('uno_user');
-      window.location.href = '/login';
+      localStorage.removeItem("uno_token");
+      localStorage.removeItem("uno_user");
+      window.location.href = "/";
     }
+
     return Promise.reject(error);
   }
 );
 
-// ─── Auth ─────────────────────────────────────────────────────────────────
+// ─── AUTH ─────────────────────────────────────────
+
 export const authAPI = {
-  register: (data) => api.post('/users', data),
-  login: (email, password) => api.post('/users/login', { email, password }),
-  logout: () => api.post('/users/logout'),
-  me: () => api.get('/users/me'),
+  register: (data) => api.post("/users", data),
+  login: (email, password) =>
+    api.post("/users/login", { email, password }),
+  me: () => api.get("/users/me"),
+  logout: () => api.post("/users/logout"),
 };
 
-// ─── Games ────────────────────────────────────────────────────────────────
+// ─── GAMES ────────────────────────────────────────
+
 export const gameAPI = {
-  list: () => api.get('/games'),
+  list: () => api.get("/games"),
   get: (id) => api.get(`/games/${id}`),
-  create: (data) => api.post('/games', data),
+  create: (data) => api.post("/games", data),
   join: (id) => api.post(`/games/${id}/join`),
-  ready: (id) => api.post(`/games/${id}/ready`),
-  start: (id) => api.post(`/games/${id}/start`),
-  finish: (id) => api.post(`/games/${id}/finish`),
-  history: (id) => api.get(`/games/${id}/history`),
+  drawCard: (id) => api.post(`/games/${id}/draw`),
+  playCard: (gameId, cardId) =>
+    api.post(`/games/${gameId}/play`, { cardId }),
   ranking: (id) => api.get(`/games/${id}/ranking`),
-  delete: (id) => api.delete(`/games/${id}`),
-};
-
-// ─── Cards ────────────────────────────────────────────────────────────────
-export const cardAPI = {
-  myCards: () => api.get('/cards/my-cards'),
-  update: (id, data) => api.put(`/cards/${id}`, data),
-};
-
-// ─── Scores ───────────────────────────────────────────────────────────────
-export const scoreAPI = {
-  ranking: () => api.get('/scores/ranking/geral'),
-  top10: () => api.get('/scores/ranking/top10'),
-  playerStats: (playerId) => api.get(`/scores/player/${playerId}/stats`),
 };
 
 export default api;

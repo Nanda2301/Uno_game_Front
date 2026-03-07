@@ -37,7 +37,7 @@ function App() {
           />
 
           <Route
-            path="/game"
+            path="/game/:id"
             element={
               <ProtectedRoute>
                 <GamePage />
@@ -46,7 +46,7 @@ function App() {
           />
 
           <Route
-            path="/winner"
+            path="/winner/:id"
             element={
               <ProtectedRoute>
                 <WinnerPage />

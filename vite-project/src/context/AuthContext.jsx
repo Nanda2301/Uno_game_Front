@@ -1,67 +1,72 @@
-import { createContext, useState, useEffect, useContext } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { authAPI } from "../services/api";
 
-// 1️⃣ Primeiro cria o contexto
-export const AuthContext = createContext({});
+export const AuthContext = createContext();
 
-// 2️⃣ Depois cria o hook customizado
-export function useAuth() {
-  return useContext(AuthContext);
-}
-
-// 3️⃣ Depois cria o provider
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
-  const [token, setToken] = useState("");
+  const [user, setUser] = useState(() => {
+    const savedUser = localStorage.getItem("uno_user");
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
+
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    const storedToken = localStorage.getItem("uno_token");
-    const storedUser = localStorage.getItem("uno_user");
-
-    if (storedToken && storedUser) {
-      setToken(storedToken);
-      setUser(JSON.parse(storedUser));
-    }
-  }, []);
-
-  async function login(email, password) {
+  // LOGIN
+  const login = async (email, password) => {
     setIsLoading(true);
-
     try {
       const response = await authAPI.login(email, password);
-      const data = response.data;
 
-      localStorage.setItem("uno_token", data.token);
-      localStorage.setItem("uno_user", JSON.stringify(data.user));
+      const { token, user } = response.data;
 
-      setToken(data.token);
-      setUser(data.user);
-    } catch (error) {
-      console.error("Erro ao logar", error);
-      throw error;
+      localStorage.setItem("uno_token", token);
+      localStorage.setItem("uno_user", JSON.stringify(user));
+
+      setUser(user);
     } finally {
       setIsLoading(false);
     }
-  }
+  };
 
-  async function logout() {
+  // REGISTER
+  const register = async (formData) => {
+    setIsLoading(true);
     try {
-      await authAPI.logout();
-    } catch (error) {
-      console.error("Erro no logout", error);
-    }
+      const response = await authAPI.register(formData);
 
+      // Se backend já retorna token:
+      if (response.data.token) {
+        localStorage.setItem("uno_token", response.data.token);
+        localStorage.setItem(
+          "uno_user",
+          JSON.stringify(response.data.user)
+        );
+        setUser(response.data.user);
+      }
+
+      return response;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // LOGOUT
+  const logout = () => {
     localStorage.removeItem("uno_token");
     localStorage.removeItem("uno_user");
-
-    setToken("");
     setUser(null);
-  }
+  };
 
   return (
-    <AuthContext.Provider value={{ user, token, isLoading, login, logout }}>
+    <AuthContext.Provider
+      value={{ user, login, register, logout, isLoading }}
+    >
       {children}
     </AuthContext.Provider>
   );
+}
+
+// Hook personalizado
+export function useAuth() {
+  return useContext(AuthContext);
 }
