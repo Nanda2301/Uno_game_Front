@@ -1,93 +1,148 @@
-# UNOFront
+# 🎴 UNO Arena — Frontend
 
+Interface moderna e responsiva para o backend UNO em Node.js.
 
+## 🚀 Setup Rápido
 
-## Getting started
+```bash
+# 1. Instalar dependências
+npm install
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+# 2. Rodar em desenvolvimento (com proxy para :3000)
+npm run dev
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
-
-## Add your files
-
-* [Create](https://docs.gitlab.com/user/project/repository/web_editor/#create-a-file) or [upload](https://docs.gitlab.com/user/project/repository/web_editor/#upload-a-file) files
-* [Add files using the command line](https://docs.gitlab.com/topics/git/add_files/#add-files-to-a-git-repository) or push an existing Git repository with the following command:
-
-```
-cd existing_repo
-git remote add origin https://gitlab.com/jala-university1/cohort-4/PT.CSPR-244.GA.T1.26.M1/SA/grupo-3/unofront.git
-git branch -M main
-git push -uf origin main
+# 3. Build para produção
+npm run build
 ```
 
-## Integrate with your tools
+> **Importante:** O backend deve estar rodando em `http://localhost:3000`
 
-* [Set up project integrations](https://gitlab.com/jala-university1/cohort-4/PT.CSPR-244.GA.T1.26.M1/SA/grupo-3/unofront/-/settings/integrations)
+---
 
-## Collaborate with your team
+## 📁 Estrutura de Componentes
 
-* [Invite team members and collaborators](https://docs.gitlab.com/user/project/members/)
-* [Create a new merge request](https://docs.gitlab.com/user/project/merge_requests/creating_merge_requests/)
-* [Automatically close issues from merge requests](https://docs.gitlab.com/user/project/issues/managing_issues/#closing-issues-automatically)
-* [Enable merge request approvals](https://docs.gitlab.com/user/project/merge_requests/approvals/)
-* [Set auto-merge](https://docs.gitlab.com/user/project/merge_requests/auto_merge/)
+```
+src/
+├── App.jsx                    # Rotas principais (React Router v6)
+├── main.jsx                   # Entry point
+├── index.css                  # Tailwind + estilos globais
+│
+├── context/
+│   └── AuthContext.jsx        # Estado global de autenticação
+│
+├── services/
+│   └── api.js                 # Axios + interceptors + endpoints
+│
+├── components/
+│   ├── UnoCard.jsx            # Carta renderizada (cores, valores, animações)
+│   └── ProtectedRoute.jsx     # Wrapper de rota autenticada
+│
+└── pages/
+    ├── AuthPage.jsx           # Login + Cadastro
+    ├── LobbyPage.jsx          # Lista salas, cria sala, ranking global
+    └── GamePage.jsx           # Mesa de jogo completa
+```
 
-## Test and Deploy
+---
 
-Use the built-in continuous integration in GitLab.
+## 🎨 Design System
 
-* [Get started with GitLab CI/CD](https://docs.gitlab.com/ci/quick_start/)
-* [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/user/application_security/sast/)
-* [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/topics/autodevops/requirements/)
-* [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/user/clusters/agent/)
-* [Set up protected environments](https://docs.gitlab.com/ci/environments/protected_environments/)
+### Paleta de Cores
+```js
+uno.red    → #E8001C   // Cartas vermelhas / CTAs primários
+uno.blue   → #0066CC   // Cartas azuis
+uno.green  → #00A550   // Cartas verdes / sucesso
+uno.yellow → #FFD700   // Cartas amarelas / destaque
+arena.bg   → #0D0D1A   // Fundo principal
+arena.glow → #4A6CF7   // Acentos e foco
+```
 
-***
+### Fontes
+- **Bangers** — Display (títulos, cartas, UNO logo)
+- **DM Sans** — Body (texto, UI)
 
-# Editing this README
+### Classes Utilitárias Customizadas
+```css
+.glass-panel        /* Container translúcido com blur */
+.btn-primary        /* Botão vermelho UNO com glow */
+.btn-secondary      /* Botão outline dark */
+.btn-success        /* Botão verde */
+.input-field        /* Input estilizado dark */
+.status-waiting     /* Badge amarelo */
+.status-progress    /* Badge verde */
+.status-finished    /* Badge cinza */
+.arena-bg-pattern   /* Grid de pontos azulados */
+.neon-text-red      /* Text-shadow neon vermelho */
+```
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+---
 
-## Suggestions for a good README
+## 🔌 API Integration (`src/services/api.js`)
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+### Autenticação
+```js
+authAPI.register(data)        // POST /users
+authAPI.login(email, pass)    // POST /users/login → retorna { token }
+authAPI.logout()              // POST /users/logout
+authAPI.me()                  // GET  /users/me
+```
 
-## Name
-Choose a self-explaining name for your project.
+### Jogos
+```js
+gameAPI.list()                // GET  /games
+gameAPI.get(id)               // GET  /games/:id
+gameAPI.create(data)          // POST /games
+gameAPI.join(id)              // POST /games/:id/join
+gameAPI.ready(id)             // POST /games/:id/ready
+gameAPI.start(id)             // POST /games/:id/start
+gameAPI.finish(id)            // POST /games/:id/finish
+gameAPI.history(id)           // GET  /games/:id/history
+gameAPI.ranking(id)           // GET  /games/:id/ranking
+```
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+### Cartas
+```js
+cardAPI.myCards()             // GET  /cards/my-cards  (auth required)
+cardAPI.update(id, data)      // PUT  /cards/:id
+```
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+### Pontuações
+```js
+scoreAPI.ranking()            // GET  /scores/ranking/geral
+scoreAPI.top10()              // GET  /scores/ranking/top10
+scoreAPI.playerStats(id)      // GET  /scores/player/:id/stats
+```
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+---
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+## 🎮 Fluxo de Estados do Jogo
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+```
+WAITING (Lobby)
+  └─ Jogadores entram → ficam prontos
+  └─ Criador inicia  →  IN_PROGRESS
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+IN_PROGRESS (Mesa)
+  └─ Cartas na mão, carta no topo
+  └─ Seleção → jogar / comprar
+  └─ Wild cards → color picker
+  └─ Criador finaliza → FINISHED
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+FINISHED (Resultado)
+  └─ Ranking da partida
+  └─ Voltar ao lobby
+```
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+---
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+## ✨ Features
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
-
-## License
-For open source projects, say how it is licensed.
-
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+- **UnoCard** — Renderiza qualquer carta com cor, valor, efeitos de brilho e flip
+- **Mesa de jogo** — Posicionamento dinâmico dos jogadores em volta da mesa
+- **Animações** — Float, slide-up, deal (distribuição de cartas), glow pulsante
+- **Polling automático** — Atualiza estado do jogo a cada 5s
+- **Wild Color Picker** — Modal para escolher cor após jogar wild/+4
+- **Histórico** — Drawer lateral com eventos da partida
+- **Ranking** — Drawer lateral com placar final
+- **Responsivo** — Mobile-first, funciona em qualquer tela
+- **Toast notifications** — Feedback visual para todas as ações
