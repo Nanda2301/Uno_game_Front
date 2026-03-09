@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { ClipLoader } from "react-spinners";
-import { authAPI } from "../services/api";
+import { userAPI } from "../services/api";
 
 function RegisterPage() {
   const navigate = useNavigate();
@@ -34,7 +34,7 @@ function RegisterPage() {
     setIsLoading(true);
 
     try {
-      await authAPI.register(form);
+      await userAPI.register(form);
       alert("Usuário criado com sucesso!");
       navigate("/"); // Redireciona para o login (rota raiz no seu App.jsx)
     } catch (error) {
