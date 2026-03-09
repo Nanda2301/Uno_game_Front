@@ -1,10 +1,10 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ClipLoader } from "react-spinners";
-import { AuthContext } from "../context/AuthContext";
+import { useAuth } from "../context/AuthContext";
 
 function LoginPage() {
-  const { login, user, isLoading } = useContext(AuthContext);
+  const { login, user, isLoading } = useAuth();
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
@@ -18,28 +18,29 @@ function LoginPage() {
 
   async function handleSubmit(e) {
     e.preventDefault();
+
+    if (isLoading) return;
+
     try {
-      await login(email, password);
-    } catch {
-      alert("Credenciais inválidas!");
+      await login(email.trim(), password);
+      navigate("/lobby");
+    } catch (err) {
+      console.error(err);
+      alert("Falha no login. Verifique seu email e senha.");
     }
   }
 
   return (
-
-    <div 
+    <div
       className="min-h-screen w-full bg-[#b72428] flex items-center justify-center bg-no-repeat bg-left"
       style={{
         backgroundImage: "url('https://i.imgur.com/HWTtTYF.png')",
-        backgroundSize: "contain" // Mantém a ilustração na proporção correta à esquerda
+        backgroundSize: "contain",
       }}
     >
-      {/* Grid transparente para manter o formulário no lugar */}
       <div className="grid grid-cols-1 lg:grid-cols-2 w-full max-w-7xl h-screen">
-        
         <div className="hidden lg:block" />
 
-        {/* Formulário centralizado na sua metade */}
         <div className="flex items-center justify-center px-6">
           <form
             onSubmit={handleSubmit}
@@ -53,25 +54,32 @@ function LoginPage() {
               <input
                 type="email"
                 placeholder="Email"
-                className="w-full p-3 rounded-xl border-none bg-white text-black placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-black/20"
+                className="w-full p-3 rounded-xl border-none bg-white text-black focus:outline-none"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                required
               />
 
               <input
                 type="password"
                 placeholder="Password"
-                className="w-full p-3 rounded-xl border-none bg-white text-black placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-black/20"
+                className="w-full p-3 rounded-xl border-none bg-white text-black focus:outline-none"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                required
               />
             </div>
 
             <button
               type="submit"
+              disabled={isLoading}
               className="bg-black text-white py-3 rounded-xl font-bold hover:scale-[1.02] transition-transform flex justify-center items-center"
             >
-              {isLoading ? <ClipLoader color="#ffffff" size={22} /> : "LOGIN"}
+              {isLoading ? (
+                <ClipLoader color="#ffffff" size={22} />
+              ) : (
+                "LOGIN"
+              )}
             </button>
 
             <p className="text-center text-sm font-medium text-black">

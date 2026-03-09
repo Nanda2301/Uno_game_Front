@@ -149,7 +149,7 @@ export default function AuthPage() {
         </div>
 
         <p className="text-center text-gray-600 text-xs mt-6">
-          UNO Arena © 2026 — Jala University
+          UNO Arena © 2024 — Jala University
         </p>
       </div>
     </div>
