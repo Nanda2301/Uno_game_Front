@@ -1,17 +1,17 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { ClipLoader } from "react-spinners";
-import { authAPI } from "../services/api";
+import { userAPI } from "../services/api";
 
 function RegisterPage() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
 
   const [form, setForm] = useState({
-    nome: "",
-    username: "",
+    name: "",     
+    userName: "", 
     email: "",
-    senha: "",
+    password: "",  
   });
 
   const [confirmarSenha, setConfirmarSenha] = useState("");
@@ -26,7 +26,7 @@ function RegisterPage() {
   async function handleSubmit(e) {
     e.preventDefault();
 
-    if (form.senha !== confirmarSenha) {
+    if (form.password !== confirmarSenha) {
       alert("Senhas não conferem!");
       return;
     }
@@ -34,18 +34,18 @@ function RegisterPage() {
     setIsLoading(true);
 
     try {
-      await authAPI.register(form);
+      await userAPI.register(form);
       alert("Usuário criado com sucesso!");
-      navigate("/login");
-    } catch {
-      alert("Erro ao cadastrar");
+      navigate("/"); // Redireciona para o login (rota raiz no seu App.jsx)
+    } catch (error) {
+      // Exibe a mensagem de erro vinda do backend se disponível
+      alert(error.response?.data?.message || "Erro ao cadastrar");
     } finally {
       setIsLoading(false);
     }
   }
 
   return (
-    /* Container com fundo único e imagem à esquerda */
     <div 
       className="min-h-screen w-full bg-[#b72428] flex items-center justify-center bg-no-repeat bg-left"
       style={{
@@ -53,13 +53,9 @@ function RegisterPage() {
         backgroundSize: "contain"
       }}
     >
-      {/* Grid para manter o posicionamento do formulário à direita */}
       <div className="grid grid-cols-1 lg:grid-cols-2 w-full max-w-7xl h-screen">
-        
-        {/* Espaço reservado para a imagem de fundo aparecer livremente */}
         <div className="hidden lg:block" />
 
-        {/* Formulário de Cadastro */}
         <div className="flex items-center justify-center px-6">
           <form
             onSubmit={handleSubmit}
@@ -71,41 +67,53 @@ function RegisterPage() {
 
             <div className="flex flex-col gap-3">
               <input 
-                name="nome" 
-                placeholder="Nome" 
+                name="name" 
+                placeholder="Nome Completo" 
+                value={form.name}
                 onChange={atualizarEstado}
+                required
                 className="w-full p-3 rounded-xl border-none bg-white text-black placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-black/20"
               />
               <input 
-                name="username" 
-                placeholder="Username" 
+                name="userName" 
+                placeholder="Nome de Jogador (Username)" 
+                value={form.userName}
                 onChange={atualizarEstado}
+                required
                 className="w-full p-3 rounded-xl border-none bg-white text-black placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-black/20"
               />
               <input 
+                type="email"
                 name="email" 
                 placeholder="Email" 
+                value={form.email}
                 onChange={atualizarEstado}
+                required
                 className="w-full p-3 rounded-xl border-none bg-white text-black placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-black/20"
               />
               <input 
                 type="password" 
-                name="senha" 
+                name="password"
                 placeholder="Senha" 
+                value={form.password}
                 onChange={atualizarEstado}
+                required
                 className="w-full p-3 rounded-xl border-none bg-white text-black placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-black/20"
               />
               <input 
                 type="password" 
                 placeholder="Confirmar Senha" 
+                value={confirmarSenha}
                 onChange={(e) => setConfirmarSenha(e.target.value)}
+                required
                 className="w-full p-3 rounded-xl border-none bg-white text-black placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-black/20"
               />
             </div>
 
             <button
               type="submit"
-              className="bg-black text-white py-3 rounded-xl font-bold hover:scale-[1.02] transition-transform flex justify-center items-center mt-2"
+              disabled={isLoading}
+              className="bg-black text-white py-3 rounded-xl font-bold hover:scale-[1.02] transition-transform flex justify-center items-center mt-2 disabled:opacity-50"
             >
               {isLoading ? <ClipLoader color="#ffffff" size={22} /> : "SIGN UP"}
             </button>

@@ -14,48 +14,56 @@ function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
+        <div
+          className="min-h-screen w-full bg-[#b72428] bg-no-repeat bg-left"
+          style={{
+            backgroundImage: "url('https://i.imgur.com/HWTtTYF.png')",
+            backgroundSize: "contain"
+          }}
+        >
+          <Routes>
+            <Route path="/" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
 
-          <Route
-            path="/lobby"
-            element={
-              <ProtectedRoute>
-                <LobbyPage />
-              </ProtectedRoute>
-            }
-          />
+            <Route
+              path="/lobby"
+              element={
+                <ProtectedRoute>
+                  <LobbyPage />
+                </ProtectedRoute>
+              }
+            />
 
-          <Route
-            path="/create"
-            element={
-              <ProtectedRoute>
-                <CreateGamePage />
-              </ProtectedRoute>
-            }
-          />
+            <Route
+              path="/create"
+              element={
+                <ProtectedRoute>
+                  <CreateGamePage />
+                </ProtectedRoute>
+              }
+            />
 
-          <Route
-            path="/game"
-            element={
-              <ProtectedRoute>
-                <GamePage />
-              </ProtectedRoute>
-            }
-          />
+            <Route
+              path="/game/:id"
+              element={
+                <ProtectedRoute>
+                  <GamePage />
+                </ProtectedRoute>
+              }
+            />
 
-          <Route
-            path="/winner"
-            element={
-              <ProtectedRoute>
-                <WinnerPage />
-              </ProtectedRoute>
-            }
-          />
+            <Route
+              path="/winner/:id"
+              element={
+                <ProtectedRoute>
+                  <WinnerPage />
+                </ProtectedRoute>
+              }
+            />
 
-          <Route path="*" element={<NotFoundPage />} />
-        </Routes>
+            <Route path="*" element={<NotFoundPage />} />
+          </Routes>
+        </div>
       </BrowserRouter>
     </AuthProvider>
   );

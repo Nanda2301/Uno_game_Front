@@ -1,66 +1,125 @@
 import { createContext, useState, useEffect, useContext } from "react";
-import { authAPI } from "../services/api";
+import { userAPI } from "../services/api";
 
-// 1️⃣ Primeiro cria o contexto
 export const AuthContext = createContext({});
 
-// 2️⃣ Depois cria o hook customizado
 export function useAuth() {
   return useContext(AuthContext);
 }
 
-// 3️⃣ Depois cria o provider
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
-  const [token, setToken] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [token, setToken] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
+  // ─────────────────────────────────────────────
+  // Carregar usuário ao iniciar aplicação
+  // ─────────────────────────────────────────────
   useEffect(() => {
-    const storedToken = localStorage.getItem("uno_token");
-    const storedUser = localStorage.getItem("uno_user");
+    async function loadUser() {
+      const storedToken = localStorage.getItem("uno_token");
 
-    if (storedToken && storedUser) {
-      setToken(storedToken);
-      setUser(JSON.parse(storedUser));
+      if (!storedToken) {
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        setToken(storedToken);
+
+        const response = await userAPI.me();
+
+        // Corrige quando backend retorna array
+        const loggedUser = Array.isArray(response.data)
+          ? response.data[0]
+          : response.data;
+
+        setUser(loggedUser);
+
+        localStorage.setItem("uno_user", JSON.stringify(loggedUser));
+
+      } catch (error) {
+        console.error("Erro ao carregar usuário:", error);
+
+        localStorage.removeItem("uno_token");
+        localStorage.removeItem("uno_user");
+
+        setUser(null);
+        setToken(null);
+      } finally {
+        setIsLoading(false);
+      }
     }
+
+    loadUser();
   }, []);
 
+  // ─────────────────────────────────────────────
+  // Login
+  // ─────────────────────────────────────────────
   async function login(email, password) {
     setIsLoading(true);
 
     try {
-      const response = await authAPI.login(email, password);
-      const data = response.data;
+      const response = await userAPI.login(email, password);
 
-      localStorage.setItem("uno_token", data.token);
-      localStorage.setItem("uno_user", JSON.stringify(data.user));
+      const { token } = response.data;
 
-      setToken(data.token);
-      setUser(data.user);
+      localStorage.setItem("uno_token", token);
+      setToken(token);
+
+      // Buscar dados do usuário após login
+      const responseUser = await userAPI.me();
+
+      const loggedUser = Array.isArray(responseUser.data)
+        ? responseUser.data[0]
+        : responseUser.data;
+
+      setUser(loggedUser);
+
+      localStorage.setItem("uno_user", JSON.stringify(loggedUser));
+
+      return loggedUser;
+
     } catch (error) {
-      console.error("Erro ao logar", error);
+      console.error("Erro ao logar:", error);
       throw error;
     } finally {
       setIsLoading(false);
     }
   }
 
+  // ─────────────────────────────────────────────
+  // Logout
+  // ─────────────────────────────────────────────
   async function logout() {
     try {
-      await authAPI.logout();
+      await userAPI.logout();
     } catch (error) {
-      console.error("Erro no logout", error);
+      console.error("Erro no logout:", error);
     }
 
     localStorage.removeItem("uno_token");
     localStorage.removeItem("uno_user");
 
-    setToken("");
+    setToken(null);
     setUser(null);
   }
 
+  // ─────────────────────────────────────────────
+  // Context value
+  // ─────────────────────────────────────────────
+  const value = {
+    user,
+    token,
+    isLoading,
+    isAuthenticated: !!user,
+    login,
+    logout,
+  };
+
   return (
-    <AuthContext.Provider value={{ user, token, isLoading, login, logout }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
