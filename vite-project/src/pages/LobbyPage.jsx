@@ -155,11 +155,18 @@ export default function LobbyPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#b72428] bg-gradient-to-br from-[#b72428] to-[#8b1a1e]">
-      <header className="bg-black/20 border-b border-white/10 backdrop-blur-md sticky top-0 z-10">
+    <div
+    className="min-h-screen w-full bg-[#b72428] bg-no-repeat bg-left"
+    style={{
+      backgroundImage: "url('https://i.imgur.com/HWTtTYF.png')",
+      backgroundSize: "contain"
+    }}
+  >
+
+   <header className="bg-black/20 border-b border-white/10 backdrop-blur-md sticky top-0 z-10">
         <div className="max-w-6xl mx-auto flex justify-between items-center px-6 py-4">
           <h1 className="text-3xl font-black text-white italic tracking-tighter">
-            🎴 UNO ONLINE
+            🎴 UNO Cards
           </h1>
 
           <div className="flex items-center gap-4">

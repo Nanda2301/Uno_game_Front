@@ -29,16 +29,20 @@ export default function UnoCard({
 }) {
   const [hovered, setHovered] = useState(false);
 
-  // Segurança: Se não houver card e não for faceDown, não renderiza quebra
   if (!card && !faceDown) return null;
 
-  const colorKey = card?.color || 'black';
+  // Safe access with optional chaining + String() conversion to prevent [object Object]
+  const colorKey = card?.color != null ? String(card.color) : 'black';
   const colors = COLOR_MAP[colorKey] || COLOR_MAP.black;
-  
-  // Tratamento rigoroso do valor para evitar [object Object]
-  const rawValue = card?.value !== undefined ? String(card.value) : '';
+
+  // Guard against object values - ensure rawValue is always a primitive string
+  const rawValueRaw = card?.value;
+  const rawValue = rawValueRaw != null && typeof rawValueRaw !== 'object'
+    ? String(rawValueRaw)
+    : '';
+
   const display = VALUE_DISPLAY[rawValue] || rawValue.toUpperCase();
-  
+
   const isWild = rawValue === 'wild' || rawValue === 'wild_draw4' || colorKey === 'black';
 
   const sizeClasses = {
